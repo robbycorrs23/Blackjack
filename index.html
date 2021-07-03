@@ -8,9 +8,13 @@
     </head>
     <body>
         <h1>Blackjack</h1>
-        <div id="dealer-image-container"></div>
+        <p id="dealer-sum-display">Dealer:</p>
+        <p id="dealer-wallet">Dealer Wallet: </p>
+        <div class="dealer-image-container"></div>
         <p id="message-el">Want to play a round?</p>
-        <p id="sum-el">Sum:</p>
+        <div class="player-image-container"></div>
+        <p id="player-sum-display">Player:</p>
+        <p id="player-wallet">Player Wallet: </p>
         <button onclick="startGame()">DEAL</button>
         <button onclick="resetGame()">RESET</button>
         <button onclick="newCard()">HIT</button>
