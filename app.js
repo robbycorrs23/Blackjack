@@ -1,65 +1,253 @@
+let deck = [
+    { value: "A", suit: "S", numValue: 11},
+    { value: "A", suit: "D", numValue: 11},
+    { value: "A", suit: "C", numValue: 11},
+    { value: "A", suit: "H", numValue: 11},
+    { value: "2", suit: "S", numValue: 2},
+    { value: "2", suit: "D", numValue: 2},
+    { value: "2", suit: "C", numValue: 2},
+    { value: "2", suit: "H", numValue: 2},
+    { value: "3", suit: "S", numValue: 3},
+    { value: "3", suit: "D", numValue: 3},
+    { value: "3", suit: "C", numValue: 3},
+    { value: "3", suit: "H", numValue: 3},
+    { value: "4", suit: "S", numValue: 4},
+    { value: "4", suit: "D", numValue: 4},
+    { value: "4", suit: "C", numValue: 4},
+    { value: "4", suit: "H", numValue: 4},
+    { value: "5", suit: "S", numValue: 5},
+    { value: "5", suit: "D", numValue: 5},
+    { value: "5", suit: "C", numValue: 5},
+    { value: "5", suit: "H", numValue: 5},
+    { value: "6", suit: "S", numValue: 6},
+    { value: "6", suit: "D", numValue: 6},
+    { value: "6", suit: "C", numValue: 6},
+    { value: "6", suit: "H", numValue: 6},
+    { value: "7", suit: "S", numValue: 7},
+    { value: "7", suit: "D", numValue: 7},
+    { value: "7", suit: "C", numValue: 7},
+    { value: "7", suit: "H", numValue: 7},
+    { value: "8", suit: "S", numValue: 8},
+    { value: "8", suit: "D", numValue: 8},
+    { value: "8", suit: "C", numValue: 8},
+    { value: "8", suit: "H", numValue: 8},
+    { value: "9", suit: "S", numValue: 9},
+    { value: "9", suit: "D", numValue: 9},
+    { value: "9", suit: "C", numValue: 9},
+    { value: "9", suit: "H", numValue: 9},
+    { value: "10", suit: "S", numValue: 10},
+    { value: "10", suit: "D", numValue: 10},
+    { value: "10", suit: "C", numValue: 10},
+    { value: "10", suit: "H", numValue: 10},
+    { value: "J", suit: "S", numValue: 10},
+    { value: "J", suit: "D", numValue: 10},
+    { value: "J", suit: "C", numValue: 10},
+    { value: "J", suit: "H", numValue: 10},
+    { value: "Q", suit: "S", numValue: 10},
+    { value: "Q", suit: "D", numValue: 10},
+    { value: "Q", suit: "C", numValue: 10},
+    { value: "Q", suit: "H", numValue: 10},
+    { value: "K", suit: "S", numValue: 10},
+    { value: "K", suit: "D", numValue: 10},
+    { value: "K", suit: "C", numValue: 10},
+    { value: "K", suit: "H", numValue: 10},
+]
+
 let player = {
-    name: "Per",
+    name: "Rob",
     chips: 200
 }
 
-let cards = []
-let sum = 0
-let hasBlackJack = false
-let isAlive = false
-let message = ""
-let messageEl = document.getElementById("message-el")
-let sumEl = document.getElementById("sum-el")
-let cardsEl = document.getElementById("cards-el")
-let playerEl = document.getElementById("player-el")
-
-playerEl.textContent = player.name + ": $" + player.chips
-
-function getRandomCard() {
-    let randomNumber = Math.floor( Math.random()*13 ) + 1
-    if (randomNumber > 10) {
-        return 10
-    } else if (randomNumber === 1) {
-        return 11
-    } else {
-        return randomNumber
-    }
+let dealer = {
+    name: "Dealer",
+    chips: 200
 }
 
+let pot = 0
+let playerCards = []
+let dealerCards = []
+let playerSum = 0
+let dealerSum = 0
+let playerHasBlackJack = false
+let dealerHasBlackJack = false
+let playerIsAlive = false
+let dealerIsAlive = false
+let playerTurn
+let message = ""
+const messageEl = document.getElementById("message-el")
+const playerWallet = document.getElementById("player-wallet")
+const dealerWallet = document.getElementById("dealer-wallet")
+const playerSumDisplay = document.getElementById("player-sum-display")
+const dealerSumDisplay = document.getElementById("dealer-sum-display")
+const playerImageContainer = document.querySelector(".player-image-container")
+const dealerImageContainer = document.querySelector(".dealer-image-container")
+const potDisplay = document.querySelector("#active-bet")
+const dealNew = document.querySelector("#deal-new")
+const gameOver = document.querySelector(".over")
+
+playerWallet.textContent = player.name + ": $" + player.chips
+dealerWallet.textContent = dealer.name + ": $" + dealer.chips
+
+function getRandomCard() {
+    const randomNumber = Math.floor(Math.random() * deck.length) - 1
+    deck.splice(randomNumber, 1)
+    return deck[randomNumber]
+}
+
+
+dealNew.addEventListener("click", startGame)
+
 function startGame() {
-    isAlive = true
-    let firstCard = getRandomCard()
-    let secondCard = getRandomCard()
-    cards = [firstCard, secondCard]
-    sum = firstCard + secondCard
-    renderGame()
+    if (pot === 0) {
+        window.alert("Please place a bet!")
+    } else {
+        playerIsAlive = true
+        dealerIsAlive = true
+        playerTurn = true
+        let playerFirstCard = getRandomCard()
+        let playerSecondCard = getRandomCard()
+        playerCards = [playerFirstCard, playerSecondCard]
+        playerTurn = false
+        let dealerFirstCard = getRandomCard()
+        dealerCards = [dealerFirstCard]
+        getSum()
+        renderGame()
+        dealNew.disabled = true
+        gameOver.disabled = false
+    }
+    
+}
+
+function resetGame () {
+    playerImageContainer.innerHTML = ""
+    dealerImageContainer.innerHTML = ""
+    playerCards = []
+    dealerCards = []
+    playerSum = 0
+    dealerSum = 0
+    playerSumDisplay.textContent = "Player Sum: " + playerSum
+    dealerSumDisplay.textContent = "Dealer Sum: " + dealerSum
+    pot = 0
+    walletDisplay()
+    playerTurn = true
+    dealNew.disabled = false
 }
 
 function renderGame() {
-    cardsEl.textContent = "Cards: "
-    for (let i = 0; i < cards.length; i++) {
-        cardsEl.textContent += cards[i] + " "
+    console.log(dealerCards)
+    console.log(playerCards)
+    dealerImageContainer.textContent = ""
+    for (let i = 0; i < dealerCards.length; i++) {
+        let path = `images/${dealerCards[i].value + dealerCards[i].suit}.png`
+        dealerImageContainer.innerHTML += `
+            <img src="${path}" id="card-image">
+        `
     }
     
-    sumEl.textContent = "Sum: " + sum
-    if (sum <= 20) {
+    playerImageContainer.textContent = ""
+    for (let i = 0; i < playerCards.length; i++) {
+        let path = `images/${playerCards[i].value + playerCards[i].suit}.png`
+        playerImageContainer.innerHTML += `
+            <img src="${path}" id="card-image">
+        `
+    }
+    
+    playerSumDisplay.textContent = "Player Sum: " + playerSum
+    dealerSumDisplay.textContent = "Dealer Sum: " + dealerSum
+    if (playerSum <= 20) {
         message = "Do you want to draw a new card?"
-    } else if (sum === 21) {
-        message = "You've got Blackjack!"
-        hasBlackJack = true
+    } else if (playerSum === 21) {
+        playerHasBlackJack = true
+        playerTurn = false
+        playerWins()
+        walletDisplay()
     } else {
-        message = "You're out of the game!"
-        isAlive = false
+        playerIsAlive = false
+        playerTurn = false
+        dealerWins()
+        walletDisplay()
     }
     messageEl.textContent = message
 }
 
 
 function newCard() {
-    if (isAlive === true && hasBlackJack === false) {
+    playerTurn = true
+    if (playerIsAlive === true && playerHasBlackJack === false) {
         let card = getRandomCard()
-        sum += card
-        cards.push(card)
-        renderGame()        
+        playerCards.push(card)
+        getSum()
+        renderGame()
+        console.log(deck.length)       
     }
+}
+
+function newDealerCard() {
+    let card = getRandomCard()
+    dealerCards.push(card)
+    getSum()
+    renderGame()
+    if (dealerSum < 17) {
+        newDealerCard()  
+    } else {
+        declareWinner()
+    }
+}
+
+function stand() {
+    playerTurn = false
+    playerSumDisplay.textContent = "Player Sum: " + playerSum
+    dealerSumDisplay.textContent = "Dealer Sum: " + dealerSum
+    newDealerCard()
+}
+
+function declareWinner () {
+    if (dealerSum > playerSum || dealerSum === 21) {
+        dealerWins ()
+        walletDisplay()
+    } else if (dealerSum === playerSum) {
+        message = "It's a draw!"
+        player.chips += (pot / 2)
+        dealer.chips += (pot / 2)
+        walletDisplay()
+    } else {
+        playerWins()
+        walletDisplay()
+    }
+    messageEl.textContent = message
+}
+
+function getSum() {
+    playerSum = playerCards.reduce((a, b) => a + b, 0)
+    dealerSum = dealerCards.reduce((a, b) => a + b, 0)
+}
+
+function bet10 () {
+    if (pot < player.chips && player.chips > 10 && dealer.chips > 10) {
+        pot += 20
+        player.chips -= 10
+        dealer.chips -= 10
+        walletDisplay()
+    }
+    potDisplay.textContent = pot
+}
+
+function walletDisplay () {
+    potDisplay.textContent = 0
+    playerWallet.textContent = player.name + ": $" + player.chips
+    dealerWallet.textContent = dealer.name + ": $" + dealer.chips
+}
+
+function playerWins () {
+    message = "Player is the winner!"
+    gameOver.disabled = true
+    player.chips += pot
+    messageEl.textContent = message
+}
+
+function dealerWins () {
+    message = "Dealer is the winner!"
+    gameOver.disabled = true
+    dealer.chips += pot
+    messageEl.textContent = message
 }
